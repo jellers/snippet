@@ -1,0 +1,55 @@
+    ---
+    - name: Gather info from vcenter about all datastores
+      vmware_datastore_info:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ vcenter_datacenter }}"
+        validate_certs: no
+      delegate_to: localhost
+      register: info
+
+    - name: Create VM from template
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_user }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ vcenter_datacenter }}"
+        cluster: nacho-cluster
+        folder: /
+        name: "{{ hostname_short }}"
+        template: "{{ instance_image }}"
+        annotation: "{{ instance_build_notes }} | {{ creationdate }}"
+        guest_id: "{{ vmware_guest_guestid }}"
+        customization:
+          hostname: "{{ hostname_short }}"
+          domain: "{{ locale }}.biz.net"
+          dns_servers:
+            - 10.10.10.10
+            - 10.10.10.11
+          dns_suffix:
+            - net.biz.net
+            - hq.biz.net
+            - remote.biz.net
+        disk:
+          - size_gb: "{{ instance_disk0_size }}"
+            type: "{{ instance_disk0_type }}"
+            datastore: "{{ vcenter_datastore }}"
+            autoselect_datastore: true
+          - size_gb: "{{ instance_disk1_size }}"
+            type: "{{ instance_disk1_type }}"
+            datastore: "{{ vcenter_datastore }}"
+            autoselect_datastore: true
+        networks: "{{ vcenter_network }}"
+        hardware:
+          hotadd_cpu: True
+          hotremove_cpu: True
+          hotadd_memory: True
+          memory_mb: "{{ instance_memory }}"
+          num_cpus: "{{ instance_cpu_count }}"
+        wait_for_ip_address: True
+        wait_for_customization: True
+        validate_certs: False
+        state: poweredon
+      register: newvm
+    ...

@@ -1,0 +1,29 @@
+---
+vcenter_datastore: vc-vmdk
+vcenter_hostname: my-vcenter-01.biz.net
+vcenter_datacenter: my-dc
+# Instance Configuration
+instance_cpu_count: 4
+instance_disk0_size: 20
+instance_disk0_type: thin
+instance_disk1_size: 300
+instance_disk1_type: thin
+instance_dumpfacts: False
+instance_memory: 16384
+instance_build_notes: "{{ description }}"
+creationdate: "{{ '+%Y/%m/%d %H:%M' | strftime }}"
+instance_image: "CentOS7-20200108-1337"
+vmware_guest_guestid: "centos7_64Guest"
+
+vcenter_user:  "{{ ldap_user }}@biz.net"
+vcenter_username: "{{ vcenter_user }}"
+vcenter_password: "{{ ldap_password }}"
+
+vcenter_network:
+  - name: "{{ network }}"
+    ip: "{{ internal_ip }}"
+    netmask: "{{ internal_subnet | ipaddr('netmask')}}"
+    gateway: "{{ internal_subnet | ipaddr('1') | ipaddr('address') }}"
+    type: static
+    start_connected: True
+...
